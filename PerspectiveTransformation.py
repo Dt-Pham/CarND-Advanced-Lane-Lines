@@ -5,15 +5,15 @@ class PerspectiveTransformation:
     """ This a class for transforming image between front view and top view
 
     Attributes:
-        parameters (dict): dictionary contains coordinates of source and destination vertices
-        src (np.array): coordinates of 4 source points
-        dst (np.array): coordinates of 4 destination points
-        name (str): name of the window when display method is called
-        M (np.array): matrix to transform image from front view to top view
-        M_inv (np.array): matrix to transform image from top view to front view
+        parameters (dict): Dictionary containing coordinates of source and destination vertices
+        src (np.array): Coordinates of 4 source points
+        dst (np.array): Coordinates of 4 destination points
+        name (str): Name of the window when display method is called
+        M (np.array): Matrix to transform image from front view to top view
+        M_inv (np.array): Matrix to transform image from top view to front view
     """
     def __init__(self):
-        """The constructor of PerspectiveTransformation."""
+        """Init PerspectiveTransformation."""
         self.parameters = get_params()
         self.src = self.parameters["src_vertices"]
         self.dst = self.parameters["dst_vertices"]

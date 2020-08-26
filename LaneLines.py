@@ -7,23 +7,56 @@ def hist(img):
     return np.sum(bottom_half, axis=0)
 
 class LaneLines:
+    """ Class containing information about detected lane lines.
+
+    Attributes:
+        left_fit (np.array): Coefficients of a polynomial that fit left lane line
+        right_fit (np.array): Coefficients of a polynomial that fit right lane line
+        parameters (dict): Dictionary containing all parameters needed for the pipeline
+        window_name (str): Name of the window when display() is called
+        debug (boolean): Flag for debug/normal mode
+    """
     def __init__(self, debug=True):
+        """Init Lanelines.
+
+        Parameters:
+            debug (boolean): If true, the display function will show more details
+        """
         self.left_fit = None
         self.right_fit = None
         self.parameters = get_params()
-        self.name = "Lane lines"
+        self.window_name = "Lane lines"
         self.debug = debug
         self.f = open("debug.txt", 'w')
 
     def __exit__(self):
+        """Close all file streams."""
         self.f.close()
 
     def forward(self, img):
-        self.out_img = self.fit_poly(img)
-        return self.out_img
+        """Take a image and detect lane lines.
+
+        Parameters:
+            img (np.array): An binary image containing relevant pixels
+
+        Returns:
+            Image (np.array): An RGB image containing lane lines pixels and other details
+        """
+        return self.fit_poly(img)
 
     def find_lane_pixels(self, img):
-        """Find lane pixels from a binary warped image """
+        """Find lane pixels from a binary warped image.
+
+        Parameters:
+            img (np.array): A binary warped image
+
+        Returns:
+            leftx (np.array): x coordinates of left lane pixels
+            lefty (np.array): y coordinates of left lane pixels
+            rightx (np.array): x coordinates of right lane pixels
+            righty (np.array): y coordinates of right lane pixels
+            out_img (np.array): A RGB image that use to display result later on.
+        """
         assert(len(img.shape) == 2)
 
         # Create an output image to draw on and visualize the result
@@ -108,6 +141,14 @@ class LaneLines:
         return leftx, lefty, rightx, righty, out_img
 
     def fit_poly(self, img):
+        """Find the lane line from an image and draw it.
+
+        Parameters:
+            img (np.array): a binary warped image
+
+        Returns:
+            out_img (np.array): a RGB image that have lane line drawn on that.
+        """
         leftx, lefty, rightx, righty, out_img = self.find_lane_pixels(img)
         
         self.left_fit = np.polyfit(lefty, leftx, 2)
@@ -137,6 +178,11 @@ class LaneLines:
         return out_img
 
     def display(self, img):
+        """ Display result of lane lines detection.
+
+        Parameters:
+            img (np.array): a binary warped image
+        """
         self.img = img
-        cv2.namedWindow(self.name)
-        cv2.imshow(self.name, self.forward(self.img))
+        cv2.namedWindow(self.window_name)
+        cv2.imshow(self.window_name, self.forward(self.img))
