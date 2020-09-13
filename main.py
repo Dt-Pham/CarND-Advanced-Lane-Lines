@@ -14,7 +14,13 @@ from PerspectiveTransformation import *
 from LaneLines import *
 
 class Application(tk.Frame):
+    """ This class is for parameter tunning.
+
+    Attributes:
+        ...
+    """
     def __init__(self, master = None):
+        """ Init Application"""
         super().__init__(master)
         self.master = master
         self.create_widgets()
@@ -25,9 +31,9 @@ class Application(tk.Frame):
         self.thresholding = Thresholding()
         self.transform = PerspectiveTransformation()
         self.lanelines = LaneLines(debug=self.debug)
-
         self.vidcap = None
         self.frames = []
+        self.current_frameid = -1
 
     def create_widgets(self):
         self.winfo_toplevel().title("Parameter Tuning")
@@ -36,7 +42,7 @@ class Application(tk.Frame):
         self.hi_there.grid(row=1)
 
         self.textbox = tk.Entry(self)
-        self.textbox.insert(0, 'test_images/test1.jpg')
+        self.textbox.insert(0, 'test_images/project_video_frame_1048.jpg')
         self.textbox.grid(row=0)
 
         self.save = tk.Button(self, text="Save params", command=self.save_parameters)
@@ -59,48 +65,60 @@ class Application(tk.Frame):
         self.get_frame_button = tk.Button(self, text="Get frame from video", command=self.get_frame)
         self.get_frame_button.grid(row=2, column=1)
 
+        self.save_frame_button = tk.Button(self, text="Save frame from video", command=self.save_frame)
+        self.save_frame_button.grid(row=3, column=1)
+
+        self.debug_button = tk.Button(self, text="Debug ON", command=self.toggle_debug)
+        self.debug_button.grid(row=1, column=3)
+
     def load_image(self):
-        self.debug = True
+        self.current_frameid = -1
         self.filepath = self.textbox.get()
         self.image = cv2.imread(self.filepath)
-
-        thresholding = Thresholding()
-        transform = PerspectiveTransformation()
-        lanelines = LaneLines()
 
         img = self.image
         cv2.imshow("original", img)
 
-        thresholding.display(img)
-        img = thresholding.forward(img)
+        self.thresholding.display(img)
+        img = self.thresholding.forward(img)
 
-        transform.display(img)
-        img = transform.forward(img)
+        self.transform.display(img)
+        img = self.transform.forward(img)
 
-        lanelines.display(img)
+        self.lanelines.display(img)
 
     def forward(self, img):
         out_img = np.copy(img)
         img = self.thresholding.forward(img)
+        img2 = np.dstack((img, img, img))
         img = self.transform.forward(img)
         img = self.lanelines.forward(img)
+        img3 = img
         img = self.transform.backward(img)
 
         out_img = cv2.addWeighted(out_img, 1, img, 0.3, 0)
+        out_img = self.lanelines.plot(out_img)
+        if self.current_frameid >= 0:
+            cv2.putText(out_img, str(self.current_frameid), org=(700, 100), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0, 0, 0), thickness=2)
+            self.current_frameid += 1
+        img2 = cv2.resize(img2, None, fx=1/2, fy=1/2)
+        img3 = cv2.resize(img3, None, fx=1/2, fy=1/2)
+        img2 = cv2.hconcat([img2, img3])
+        out_img = cv2.vconcat([img2, out_img])
         return out_img
-    
+
     def process_image(self):
-        self.debug = False
+        self.current_frameid = -1
         img = cv2.imread(self.textbox.get())
         out_img = self.forward(img)
         cv2.imshow("output", out_img)
 
     def process_video(self):
-        self.debug = False
+        self.current_frameid = 0
         self.filepath = self.textbox.get()
         clip = VideoFileClip(self.filepath)
         out_clip = clip.fl_image(self.forward)
-        out_clip.write_videofile("output_videos/"+path, audio=False)
+        out_clip.write_videofile("output_videos/"+self.filepath, audio=False)
 
     def get_frame(self):
         path = self.textbox.get()
@@ -122,11 +140,28 @@ class Application(tk.Frame):
                 return
             success, image = self.vidcap.read()
 
-        return
+    def save_frame(self):
+        path = self.textbox.get()
+        frame_id = int(self.frame_textbox.get())
+
+        l = path.rfind('/')+1
+        r = path.find('.')
+        output_path = "test_images/"+path[l:r]+"_frame_{}.jpg".format(frame_id)
+        self.get_frame()
+        cv2.imwrite(output_path, self.frames[frame_id])
+
+    def toggle_debug(self):
+        self.debug = not self.debug
+        if self.debug:
+            self.debug_button.config(text="Debug ON")
+        else:
+            self.debug_button.config(text="Debug OFF")
+        self.lanelines.debug = self.debug
 
     def save_parameters(self):
+        self.thresholding.save_parameters()
         save_params()
-    
+
     def load_parameters(self):
         load_params()
         self.thresholding = Thresholding()

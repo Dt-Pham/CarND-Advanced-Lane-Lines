@@ -10,14 +10,15 @@ _parameters = {
     "s_thresh_high" : 300,
     "sx_thresh_low": 0,
     "sx_thresh_high": 255,
+    "region_of_interest": np.ones((720, 1280), dtype=np.bool),
     "src_vertices": np.float32([(550, 460),    # top-left
                                 (150, 720),    # bottom-left
                                 (1200, 720),   # bottom-right
                                 (770, 460)]),  # top-right
-    "dst_vertices": np.float32([(0, 0),
-                                (0, 720),
-                                (1200, 720),
-                                (1200, 0)]),
+    "dst_vertices": np.float32([(100, 0),
+                                (100, 720),
+                                (1100, 720),
+                                (1100, 0)]),
     "nwindows": 9,
     "margin": 100,
     "minpix": 50
