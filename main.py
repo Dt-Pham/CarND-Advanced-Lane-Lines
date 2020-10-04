@@ -98,13 +98,13 @@ class Application(tk.Frame):
 
         out_img = cv2.addWeighted(out_img, 1, img, 0.3, 0)
         out_img = self.lanelines.plot(out_img)
-        if self.current_frameid >= 0:
+        if self.debug and self.current_frameid >= 0:
             cv2.putText(out_img, str(self.current_frameid), org=(700, 100), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0, 0, 0), thickness=2)
             self.current_frameid += 1
-        img2 = cv2.resize(img2, None, fx=1/2, fy=1/2)
-        img3 = cv2.resize(img3, None, fx=1/2, fy=1/2)
-        img2 = cv2.hconcat([img2, img3])
-        out_img = cv2.vconcat([img2, out_img])
+        # img2 = cv2.resize(img2, None, fx=1/2, fy=1/2)
+        # img3 = cv2.resize(img3, None, fx=1/2, fy=1/2)
+        # img2 = cv2.hconcat([img2, img3])
+        # out_img = cv2.vconcat([img2, out_img])
         return out_img
 
     def process_image(self):

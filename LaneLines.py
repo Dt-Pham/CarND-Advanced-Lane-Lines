@@ -272,16 +272,51 @@ class LaneLines:
             else:
                 cv2.line(out_img, (l, y), (r, y), (0, 255, 0))
 
-        if len(lefty) > 0 : out_img[lefty, leftx] = [255, 0, 0]
-        if len(righty) > 0: out_img[righty, rightx] = [0, 0, 255]
+        if self.debug and len(lefty) > 0 : out_img[lefty, leftx] = [255, 0, 0]
+        if self.debug and len(righty) > 0: out_img[righty, rightx] = [0, 0, 255]
 
         return out_img
 
     def plot(self, out_img):
         np.set_printoptions(precision=6, suppress=True)
-        cv2.putText(out_img, str(self.left_fit), org=(10, 50), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0, 0, 0), thickness=2)
-        cv2.putText(out_img, str(self.right_fit), org=(10, 100), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0, 0, 0), thickness=2)
+        lR, rR, pos = self.measure_curvature()
+        cv2.putText(
+            out_img,
+            "Left curvature: {:.3f} m, Right curvature: {:.3f} m".format(lR, rR),
+            org=(10, 40),
+            fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+            fontScale=1,
+            color=(0, 0, 0),
+            thickness=2)
+
+        cv2.putText(
+            out_img,
+            "Vehicle is {:.2f} m away from center".format(pos),
+            org=(100, 80),
+            fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+            fontScale=1,
+            color=(0, 0, 0),
+            thickness=2)
+
         return out_img
+
+    def measure_curvature(self):
+        ym = 30/720
+        xm = 3.7/700
+
+        left_fit = self.left_fit.copy()
+        right_fit = self.right_fit.copy()
+        y_eval = 700 * ym
+
+        # Compute R_curve (radius of curvature)
+        left_curveR =  ((1 + (2*left_fit[0] *y_eval + left_fit[1])**2)**1.5)  / np.absolute(2*left_fit[0])
+        right_curveR = ((1 + (2*right_fit[0]*y_eval + right_fit[1])**2)**1.5) / np.absolute(2*right_fit[0])
+
+        xl = np.dot(self.left_fit, [700**2, 700, 1])
+        xr = np.dot(self.right_fit, [700**2, 700, 1])
+        pos = (1280//2 - (xl+xr)//2)*xm
+
+        return left_curveR, right_curveR, pos
 
     def display(self, img):
         """ Display result of lane lines detection.
