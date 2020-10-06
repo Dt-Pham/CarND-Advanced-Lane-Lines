@@ -30,7 +30,6 @@ class LaneLines:
         self.debug = debug
         self.parameters = get_params()
         self.window_name = "Lane lines"
-        self.debug_file = open("debug.txt", 'w')
 
         self.left_fit = None
         self.right_fit = None
@@ -46,10 +45,6 @@ class LaneLines:
         self.margin = self.parameters["margin"]
         # Mininum number of pixels found to recenter window
         self.minpix = self.parameters["minpix"]
-
-    def __exit__(self):
-        """Close all file streams."""
-        self.debug_file.close()
 
     def forward(self, img):
         """Take a image and detect lane lines.
@@ -252,7 +247,6 @@ class LaneLines:
             self.left_fit = np.polyfit(lefty, leftx, 2)
         if len(righty) > 50:
             self.right_fit = np.polyfit(righty, rightx, 2)
-        # print(self.left_fit, self.right_fit, file=self.debug_file)
 
         # Generate x and y values for plotting
         ploty = np.linspace(0, img.shape[0]-1, img.shape[0])
