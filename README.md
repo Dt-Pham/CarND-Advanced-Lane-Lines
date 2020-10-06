@@ -50,3 +50,4 @@ python main.py
 # Todo:
 - [ ] Improve UI of the application
 - [ ] Add more parameters to the pipeline
+- [ ] Add CNN model to the pipeline
