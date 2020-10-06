@@ -21,3 +21,19 @@ The images for camera calibration are stored in the folder called `camera_cal`. 
 The `challenge_video.mp4` video is an extra (and optional) challenge for you if you want to test your pipeline under somewhat trickier conditions.  The `harder_challenge.mp4` video is another optional challenge and is brutal!
 
 If you're feeling ambitious (again, totally optional though), don't stop there!  We encourage you to go out and take video of your own, calibrate your camera and show us how you would implement this project from scratch!
+
+## Usage:
+
+1. Set up the environment `conda env create -f environment.yml`
+   
+    To activate the environment:
+
+    Window: `conda activate carnd`
+
+    Linux, MacOS: `source activate carnd`
+
+2. Run the pipeline:
+```bash
+python main.py
+```
+
