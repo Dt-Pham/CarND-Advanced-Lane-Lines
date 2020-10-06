@@ -24,16 +24,26 @@ If you're feeling ambitious (again, totally optional though), don't stop there! 
 
 ## Usage:
 
-1. Set up the environment `conda env create -f environment.yml`
-   
-    To activate the environment:
+### 1. Set up the environment 
+`conda env create -f environment.yml`
 
-    Window: `conda activate carnd`
+To activate the environment:
 
-    Linux, MacOS: `source activate carnd`
+Window: `conda activate carnd`
 
-2. Run the pipeline:
+Linux, MacOS: `source activate carnd`
+
+### 2. Run the pipeline:
 ```bash
 python main.py
 ```
+![](example_images/tool.png)
 
+- The text box on the left is the path to the image or video you wish to process.
+- If the text box on the left is the path to a video, you can specify a number on the text box on the right which is the frame of the video you want to extract.
+- `Save params` and `Load params` will save all the parameters of the pipeline to a file called `params.pkl`
+
+# Todo:
+- [ ] Improve UI of the application
+- [ ] Create more changeable parameter in the pipeline
+- [ ] ...
